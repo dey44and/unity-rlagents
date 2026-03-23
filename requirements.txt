@@ -1,0 +1,2 @@
+mlagents_envs==1.1.0
+ncps==1.0.0
