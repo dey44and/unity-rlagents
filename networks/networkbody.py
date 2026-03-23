@@ -10,10 +10,8 @@ class NetworkBody(nn.Module):
     """
     The network body consists of several layers that are shared by actor and critic.
     """
-    def __init__(
-        self, 
-        netsettings: NetworkSettings
-    ):
+
+    def __init__(self, netsettings: NetworkSettings):
         """
         Inits NetworkBody.
 
@@ -32,9 +30,9 @@ class NetworkBody(nn.Module):
         for _ in range(self.num_layers):
             layers.append(
                 LinearBlock(
-                    input_dim = in_dim, 
-                    output_dim = self.hidden_dim, 
-                    weights_gain = netsettings.weights_gain
+                    input_dim=in_dim,
+                    output_dim=self.hidden_dim,
+                    weights_gain=netsettings.weights_gain,
                 )
             )
             in_dim = self.hidden_dim

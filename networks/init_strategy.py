@@ -1,4 +1,4 @@
-from enum import Enum 
+from enum import Enum
 from typing import Callable
 import torch
 import torch.nn as nn
@@ -8,6 +8,7 @@ class InitializationEnum(Enum):
     """
     Enumerates supported parameter initialization methods.
     """
+
     ZEROS = "zeros"
     ONES = "ones"
     XAVIER_NORMAL = "xavier_normal"
@@ -15,16 +16,18 @@ class InitializationEnum(Enum):
     ORTHOGONAL = "orthogonal"
 
 
-WEIGHT_INIT_METHODS: dict[InitializationEnum, Callable[[torch.Tensor], torch.Tensor]] = {
-    InitializationEnum.XAVIER_NORMAL:  nn.init.xavier_normal_,
+WEIGHT_INIT_METHODS: dict[
+    InitializationEnum, Callable[[torch.Tensor], torch.Tensor]
+] = {
+    InitializationEnum.XAVIER_NORMAL: nn.init.xavier_normal_,
     InitializationEnum.XAVIER_UNIFORM: nn.init.xavier_uniform_,
-    InitializationEnum.ORTHOGONAL: nn.init.orthogonal_
+    InitializationEnum.ORTHOGONAL: nn.init.orthogonal_,
 }
 
 
 BIAS_INIT_METHODS: dict[InitializationEnum, Callable[[torch.Tensor], torch.Tensor]] = {
     InitializationEnum.ZEROS: nn.init.zeros_,
-    InitializationEnum.ONES: nn.init.ones_
+    InitializationEnum.ONES: nn.init.ones_,
 }
 
 
@@ -32,6 +35,7 @@ class InitStrategy:
     """
     Base strategy interface for initializing neural network modules.
     """
+
     def initialize(self, module: nn.Module):
         """
         Initializes the provided module in-place.
@@ -46,11 +50,12 @@ class LinearInitStrategy(InitStrategy):
     """
     Initialization strategy for linear layers.
     """
+
     def __init__(
         self,
-        weights_init: InitializationEnum = InitializationEnum.ORTHOGONAL, 
+        weights_init: InitializationEnum = InitializationEnum.ORTHOGONAL,
         weights_gain: float = 1.0,
-        bias_init: InitializationEnum = InitializationEnum.ZEROS
+        bias_init: InitializationEnum = InitializationEnum.ZEROS,
     ):
         """
         Inits the linear initialization strategy.
@@ -82,12 +87,13 @@ class LSTMInitStrategy(InitStrategy):
     """
     Initialization strategy for LSTM layers with gate-aware setup.
     """
+
     def __init__(
         self,
         forget_bias: float = 1.0,
         weights_init: InitializationEnum = InitializationEnum.XAVIER_UNIFORM,
         recurrent_init: InitializationEnum = InitializationEnum.ORTHOGONAL,
-        bias_init: InitializationEnum = InitializationEnum.ZEROS
+        bias_init: InitializationEnum = InitializationEnum.ZEROS,
     ):
         """
         Inits the LSTM initialization strategy.

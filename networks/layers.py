@@ -9,13 +9,14 @@ class LinearBlock(nn.Module):
     """
     The linear block consists of a dense layer, a normalization layer, and a SiLU activation layer.
     """
+
     def __init__(
-        self, 
-        input_dim: int, 
-        output_dim: int, 
-        weights_init: InitializationEnum = InitializationEnum.ORTHOGONAL, 
+        self,
+        input_dim: int,
+        output_dim: int,
+        weights_init: InitializationEnum = InitializationEnum.ORTHOGONAL,
         weights_gain: float = 1.0,
-        bias_init: InitializationEnum = InitializationEnum.ZEROS
+        bias_init: InitializationEnum = InitializationEnum.ZEROS,
     ):
         """
         Inits the linear block.
@@ -30,7 +31,9 @@ class LinearBlock(nn.Module):
         super().__init__()
         # Configure the linear layer, and initialize weights
         linear = nn.Linear(input_dim, output_dim, True)
-        initializer: InitStrategy = LinearInitStrategy(weights_init, weights_gain, bias_init)
+        initializer: InitStrategy = LinearInitStrategy(
+            weights_init, weights_gain, bias_init
+        )
         initializer.initialize(linear)
 
         # Configure the normalization + activation
@@ -49,6 +52,7 @@ class LSTMBlock(nn.Module):
     """
     Recurrent block wrapping an LSTM layer and memory state handling.
     """
+
     def __init__(
         self,
         input_dim: int,
@@ -58,7 +62,7 @@ class LSTMBlock(nn.Module):
         forget_bias: float = 1.0,
         weights_init: InitializationEnum = InitializationEnum.XAVIER_UNIFORM,
         recurrent_init: InitializationEnum = InitializationEnum.ORTHOGONAL,
-        bias_init: InitializationEnum = InitializationEnum.ZEROS
+        bias_init: InitializationEnum = InitializationEnum.ZEROS,
     ):
         """
         Inits the LSTM block.
@@ -77,7 +81,9 @@ class LSTMBlock(nn.Module):
         self.hidden_dim = hidden_dim
         # Configure the LSTM layer, and initialize weights
         self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=batch_first)
-        initializer: InitStrategy = LSTMInitStrategy(forget_bias, weights_init, recurrent_init, bias_init)
+        initializer: InitStrategy = LSTMInitStrategy(
+            forget_bias, weights_init, recurrent_init, bias_init
+        )
         initializer.initialize(self.lstm)
 
     def forward(self, x: torch.Tensor, memory: torch.Tensor):
@@ -102,6 +108,7 @@ class CfCBlock(nn.Module):
     """
     Placeholder block for a future Closed-form Continuous-time module.
     """
+
     def __init__(self):
         """
         Inits the CfC block placeholder.
