@@ -13,6 +13,7 @@ jobs:
 
     strategy:
       matrix:
+      # Compatible Python version for mlagents
         python-version: ["3.10.12"]
 
     steps:

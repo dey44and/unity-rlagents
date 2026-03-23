@@ -49,9 +49,7 @@ class NetworkBody(nn.Module):
         self.body = nn.Sequential(*layers)
 
     def forward(
-        self, 
-        x: torch.Tensor,
-        memory: Optional[torch.Tensor]
+        self, x: torch.Tensor, memory: Optional[torch.Tensor]
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         """
         Encodes observations through the shared network body.
