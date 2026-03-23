@@ -1,4 +1,10 @@
-from .init_strategy import InitializationEnum, InitStrategy, LinearInitStrategy, LSTMInitStrategy, CfCInitStrategy
+from .init_strategy import (
+    InitializationEnum,
+    InitStrategy,
+    LinearInitStrategy,
+    LSTMInitStrategy,
+    CfCInitStrategy,
+)
 from ncps.torch import CfC
 from typing import Tuple
 
@@ -88,7 +94,9 @@ class LSTMBlock(nn.Module):
         )
         initializer.initialize(self.lstm)
 
-    def forward(self, x: torch.Tensor, memory: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(
+        self, x: torch.Tensor, memory: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Runs an LSTM step sequence and returns updated memory.
 
@@ -122,8 +130,12 @@ class LSTMBlock(nn.Module):
                 (num_layers, batch_size, 2 * hidden_dim).
         """
         num_layers = self.lstm.num_layers
-        h0 = torch.zeros(num_layers, batch_size, self.hidden_dim, device=device, dtype=dtype)
-        c0 = torch.zeros(num_layers, batch_size, self.hidden_dim, device=device, dtype=dtype)
+        h0 = torch.zeros(
+            num_layers, batch_size, self.hidden_dim, device=device, dtype=dtype
+        )
+        c0 = torch.zeros(
+            num_layers, batch_size, self.hidden_dim, device=device, dtype=dtype
+        )
         return torch.cat((h0, c0), dim=-1)
 
 
@@ -165,7 +177,9 @@ class CfCBlock(nn.Module):
         initializer: InitStrategy = CfCInitStrategy(weights_init, bias_init)
         initializer.initialize(self.cfc)
 
-    def forward(self, x: torch.Tensor, memory: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(
+        self, x: torch.Tensor, memory: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Runs a CfC sequence and returns updated memory.
 

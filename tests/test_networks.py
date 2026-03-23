@@ -38,7 +38,9 @@ def test_init_strategy_base_raises_not_implemented() -> None:
 
 def test_lstm_block_init_memory_shape() -> None:
     block = LSTMBlock(input_dim=8, hidden_dim=16, num_layers=2)
-    memory = block.init_memory(batch_size=3, device=torch.device("cpu"), dtype=torch.float32)
+    memory = block.init_memory(
+        batch_size=3, device=torch.device("cpu"), dtype=torch.float32
+    )
     assert memory.shape == (2, 3, 32)
 
 
@@ -72,7 +74,9 @@ def test_lstm_init_strategy_applies_forget_bias() -> None:
 
 def test_cfc_block_init_memory_shape() -> None:
     block = CfCBlock(input_dim=8, cfc_units=12)
-    memory = block.init_memory(batch_size=3, device=torch.device("cpu"), dtype=torch.float32)
+    memory = block.init_memory(
+        batch_size=3, device=torch.device("cpu"), dtype=torch.float32
+    )
     assert memory.shape == (1, 3, 12)
 
 
