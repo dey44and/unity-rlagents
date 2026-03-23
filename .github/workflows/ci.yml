@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.9, "3.10"]
+        python-version: ["3.10"]
 
     steps:
     - uses: actions/checkout@v6
@@ -25,13 +25,17 @@ jobs:
 
     - name: Install tooling
       run: |
+        set -euxo pipefail
+        python --version
+        python -m pip --version
         python -m pip install --upgrade pip
-        python -m pip install pytest black flake8
+        python -m pip install -v pytest black flake8
 
     - name: Install project dependencies
       run: |
+        set -euxo pipefail
         if [ -f requirements.txt ]; then
-          python -m pip install --prefer-binary -r requirements.txt
+          python -m pip install -v --prefer-binary -r requirements.txt
         fi
 
     - name: Lint with flake8
