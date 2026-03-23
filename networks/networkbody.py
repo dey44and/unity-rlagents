@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from typing import List, Tuple, Optional
 from config.settings import NetworkSettings
-from .layers import LinearBlock, LSTMBlock
+from .layers import CfCBlock, LinearBlock, LSTMBlock
 
 
 class NetworkBody(nn.Module):
@@ -18,7 +18,7 @@ class NetworkBody(nn.Module):
         Args:
             netsettings (NetworkSettings): A tuple containing the configuration data.
         """
-        super().__init__()
+        super(NetworkBody, self).__init__()
         self.net_settings = netsettings
 
         layers: List[nn.Module] = []
@@ -35,49 +35,60 @@ class NetworkBody(nn.Module):
             in_dim = self.net_settings.hidden_dim
 
         # Add the memory layer
-        if self.net_settings.memory is not None:
-            memory = self.net_settings.memory
-            if memory.module_type == "lstm":
-                self.memory = LSTMBlock(
+        self.memory_settings = self.net_settings.memory
+        self.memory_block: Optional[nn.Module] = None
+        if self.memory_settings is not None:
+            if self.memory_settings.module_type == "lstm":
+                self.memory_block = LSTMBlock(
                     input_dim=self.net_settings.hidden_dim,
-                    hidden_dim=memory.memory_dim,
+                    hidden_dim=self.memory_settings.memory_dim,
                 )
-            elif memory.module_type == "cfc":
-                pass
+            elif self.memory_settings.module_type == "cfc":
+                self.memory_block = CfCBlock(
+                    input_dim=self.net_settings.hidden_dim,
+                    cfc_units=self.memory_settings.memory_dim,
+                )
+            else:
+                raise ValueError(
+                    f"Expected LSTM or CfC, got {self.memory_settings.module_type}"
+                )
 
         # Convert the list into a sequence of nn modules
         self.body = nn.Sequential(*layers)
 
     def forward(
-        self, x: torch.Tensor, memory: Optional[torch.Tensor]
+        self, x: torch.Tensor, memory: Optional[torch.Tensor] = None
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         """
         Encodes observations through the shared network body.
 
         Args:
             x (torch.Tensor): Input observation tensor.
+            memory (Optional[torch.Tensor]): Optional recurrent memory input.
 
         Returns:
-            torch.Tensor: Encoded feature tensor.
+            Tuple[torch.Tensor, Optional[torch.Tensor]]:
+                Encoded features and optional updated recurrent memory.
         """
         x = self.body(x)
 
         # Return directly x if the memory module is not used
-        if self.net_settings.memory is None:
+        if self.memory_block is None:
             return x, None
 
-        # Unsqueeze the input tensor for time axis
+        if not isinstance(self.memory_block, (LSTMBlock, CfCBlock)):
+            raise TypeError(
+                f"Expected LSTMBlock or CfCBlock, got {type(self.memory_block).__name__}"
+            )
+
+        # Recurrent modules consume sequence inputs [B, T, F].
         if x.dim() == 2:
             x = x.unsqueeze(1)
 
-        # Initialize memory if it is None
+        # Delegate memory tensor construction to the selected recurrent block.
         if memory is None:
-            batch_size = x.size(0)
-            num_layers = 1
-            hidden_dim = self.net_settings.memory.memory_dim
+            memory = self.memory_block.init_memory(
+                batch_size=x.size(0), device=x.device, dtype=x.dtype
+            )
 
-            h0 = torch.zeros(num_layers, batch_size, hidden_dim)
-            c0 = torch.zeros(num_layers, batch_size, hidden_dim)
-            memory = torch.cat((h0, c0), dim=-1)
-
-        return self.memory(x, memory)
+        return self.memory_block(x, memory)

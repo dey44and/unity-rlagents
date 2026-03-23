@@ -138,3 +138,39 @@ class LSTMInitStrategy(InitStrategy):
 
                 elif "bias_hh" in name:
                     BIAS_INIT_METHODS[self.bias_init](param)
+
+
+class CfCInitStrategy(InitStrategy):
+    """
+    Initialization strategy for CfC layers.
+    """
+
+    def __init__(
+        self,
+        weights_init: InitializationEnum = InitializationEnum.XAVIER_UNIFORM,
+        bias_init: InitializationEnum = InitializationEnum.ZEROS,
+    ):
+        """
+        Inits the CfC initialization strategy.
+
+        Args:
+            weights_init (InitializationEnum): Method used for weight initialization.
+            bias_init (InitializationEnum): Method used for bias initialization.
+        """
+        super().__init__()
+        self.weights_init = weights_init
+        self.bias_init = bias_init
+
+    def initialize(self, module: nn.Module):
+        """
+        Applies configured initialization to a CfC module.
+
+        Args:
+            module (nn.Module): Target CfC module.
+        """
+        with torch.no_grad():
+            for name, param in module.named_parameters():
+                if "weight" in name:
+                    WEIGHT_INIT_METHODS[self.weights_init](param)
+                elif "bias" in name:
+                    BIAS_INIT_METHODS[self.bias_init](param)
