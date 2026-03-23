@@ -57,7 +57,7 @@ class LSTMBlock(nn.Module):
         self,
         input_dim: int,
         hidden_dim: int,
-        num_layers: int,
+        num_layers: int = 1,
         batch_first: bool = True,
         forget_bias: float = 1.0,
         weights_init: InitializationEnum = InitializationEnum.XAVIER_UNIFORM,
