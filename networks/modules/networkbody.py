@@ -40,9 +40,7 @@ class NetworkBody(nn.Module):
         if self.net_settings.memory is not None:
             memory_settings = self.net_settings.memory_settings
             self.memory_block = MemModuleCreator.create(
-                self.net_settings.memory, 
-                self.net_settings.hidden_dim, 
-                memory_settings
+                self.net_settings.memory, self.net_settings.hidden_dim, memory_settings
             )
 
         # Convert the list into a sequence of nn modules

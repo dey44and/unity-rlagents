@@ -3,18 +3,13 @@ from typing import Union
 from config.settings import LSTMMemorySettings, CfCMemorySettings
 import torch.nn as nn
 
-
 _memory_builders = {
     "lstm": lambda cfg, in_dim: LSTMBlock(
-        input_dim=in_dim, 
-        hidden_dim=cfg.memory_dim, 
-        num_layers=cfg.num_layers
+        input_dim=in_dim, hidden_dim=cfg.memory_dim, num_layers=cfg.num_layers
     ),
     "cfc": lambda cfg, in_dim: CfCBlock(
-        input_dim=in_dim, 
-        cfc_units=cfg.memory_dim,
-        cfc_mode=cfg.mode
-    )
+        input_dim=in_dim, cfc_units=cfg.memory_dim, cfc_mode=cfg.mode
+    ),
 }
 
 
@@ -25,9 +20,9 @@ class MemModuleCreator:
 
     @staticmethod
     def create(
-        memory_type: str, 
+        memory_type: str,
         input_dim: int,
-        config: Union[LSTMMemorySettings, CfCMemorySettings]
+        config: Union[LSTMMemorySettings, CfCMemorySettings],
     ) -> nn.Module:
         """
         Builds the configured recurrent module.
