@@ -3,7 +3,8 @@ import torch.nn as nn
 
 from typing import List, Tuple, Optional
 from config.settings import NetworkSettings
-from .layers import CfCBlock, LinearBlock, LSTMBlock
+from .init_memory import MemModuleCreator
+from .layers import LinearBlock
 
 
 class NetworkBody(nn.Module):
@@ -21,9 +22,9 @@ class NetworkBody(nn.Module):
         super(NetworkBody, self).__init__()
         self.net_settings = netsettings
 
+        # Add the encoding layers
         layers: List[nn.Module] = []
         in_dim = self.net_settings.num_observations
-        # Add the encoding layers
         for _ in range(self.net_settings.num_layers):
             layers.append(
                 LinearBlock(
@@ -35,23 +36,14 @@ class NetworkBody(nn.Module):
             in_dim = self.net_settings.hidden_dim
 
         # Add the memory layer
-        self.memory_settings = self.net_settings.memory
         self.memory_block: Optional[nn.Module] = None
-        if self.memory_settings is not None:
-            if self.memory_settings.module_type == "lstm":
-                self.memory_block = LSTMBlock(
-                    input_dim=self.net_settings.hidden_dim,
-                    hidden_dim=self.memory_settings.memory_dim,
-                )
-            elif self.memory_settings.module_type == "cfc":
-                self.memory_block = CfCBlock(
-                    input_dim=self.net_settings.hidden_dim,
-                    cfc_units=self.memory_settings.memory_dim,
-                )
-            else:
-                raise ValueError(
-                    f"Expected LSTM or CfC, got {self.memory_settings.module_type}"
-                )
+        if self.net_settings.memory is not None:
+            memory_settings = self.net_settings.memory_settings
+            self.memory_block = MemModuleCreator.create(
+                self.net_settings.memory, 
+                self.net_settings.hidden_dim, 
+                memory_settings
+            )
 
         # Convert the list into a sequence of nn modules
         self.body = nn.Sequential(*layers)
@@ -75,11 +67,6 @@ class NetworkBody(nn.Module):
         # Return directly x if the memory module is not used
         if self.memory_block is None:
             return x, None
-
-        if not isinstance(self.memory_block, (LSTMBlock, CfCBlock)):
-            raise TypeError(
-                f"Expected LSTMBlock or CfCBlock, got {type(self.memory_block).__name__}"
-            )
 
         # Recurrent modules consume sequence inputs [B, T, F].
         if x.dim() == 2:

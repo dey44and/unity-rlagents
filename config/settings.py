@@ -1,13 +1,22 @@
-from typing import NamedTuple, Optional
+from typing import NamedTuple, Optional, Union
 
 
-class MemorySettings(NamedTuple):
+class LSTMMemorySettings(NamedTuple):
     """
-    Immutable configuration container for the memory module.
+    Immutable configuration container for the lstm memory module.
     """
 
-    module_type: str
     memory_dim: int
+    num_layers: int
+
+
+class CfCMemorySettings(NamedTuple):
+    """
+    Immutable configuration container for the cfc memory module.
+    """
+
+    memory_dim: int
+    mode: str
 
 
 class NetworkSettings(NamedTuple):
@@ -19,4 +28,5 @@ class NetworkSettings(NamedTuple):
     num_layers: int
     hidden_dim: int
     weights_gain: float
-    memory: Optional[MemorySettings]
+    memory: str
+    memory_settings: Optional[Union[LSTMMemorySettings, CfCMemorySettings]]

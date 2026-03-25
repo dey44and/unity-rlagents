@@ -52,6 +52,15 @@ class LinearBlock(nn.Module):
         self.linear_block = nn.Sequential(linear, norm, activation)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Applies linear projection, layer normalization, and SiLU activation.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+
+        Returns:
+            torch.Tensor: Transformed tensor.
+        """
         return self.linear_block(x)
 
 
