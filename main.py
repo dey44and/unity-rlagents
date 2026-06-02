@@ -9,7 +9,7 @@ if __name__ == "__main__":
     memory = CfCMemorySettings(memory_dim=32, mode="default")
     netsettings = NetworkSettings(
         num_observations=4,
-        num_layers=2,
+        num_layers=1,
         hidden_dim=32,
         weights_gain=1.41,
         memory="cfc",
